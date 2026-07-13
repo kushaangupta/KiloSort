@@ -49,6 +49,12 @@ Nchan = rez.ops.Nchan;
 connected   = rez.connected(:);
 xcoords     = rez.xcoords(:);
 ycoords     = rez.ycoords(:);
+% zcoords: present for 3-D probes (e.g. double-sided shanks), else zeros
+if isfield(rez, 'zcoords')
+    zcoords = rez.zcoords(:);
+else
+    zcoords = zeros(size(xcoords));
+end
 chanMap     = rez.ops.chanMap(:);
 chanMap0ind = chanMap - 1;
 
@@ -91,9 +97,13 @@ if ~isempty(savePath)
     chanMap0ind = int32(chanMap0ind);
     
     writeNPY(chanMap0ind(conn), fullfile(savePath, 'channel_map.npy'));
-    %writeNPY(connected, fullfile(savePath, 'connected.npy'));
-%     writeNPY(Fs, fullfile(savePath, 'Fs.npy'));
-    writeNPY([xcoords(conn) ycoords(conn)], fullfile(savePath, 'channel_positions.npy'));
+    % Project 3-D geometry to 2-D for Phy's channel map viewer:
+    %   xcoords_2d = xcoords + zcoords  (shifts each shank horizontally by z-depth)
+    %   ycoords_2d = ycoords            (depth axis unchanged)
+    % For 2-D probes zcoords is all-zeros so this is a no-op.
+    xcoords_2d = xcoords + zcoords;
+    ycoords_2d = ycoords;
+    writeNPY([xcoords_2d(conn) ycoords_2d(conn)], fullfile(savePath, 'channel_positions.npy'));
     
     writeNPY(templateFeatures, fullfile(savePath, 'template_features.npy'));
     writeNPY(templateFeatureInds'-1, fullfile(savePath, 'template_feature_ind.npy'));% -1 for zero indexing
