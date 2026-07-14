@@ -52,7 +52,7 @@ else
     zc = zeros(numel(chanMapConn), 1);
 end
 if exist('kcoords', 'var')
-    kcoords = kcoords(connected);
+    kcoords = kcoords(connected>1e-6);
 else
     kcoords = ones(ops.Nchan, 1);
 end
