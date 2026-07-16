@@ -56,6 +56,10 @@ if exist('kcoords', 'var')
 else
     kcoords = ones(ops.Nchan, 1);
 end
+if exist('sidecoords', 'var')
+    rez.sidecoords = sidecoords(connected > 1e-6);
+end
+
 NchanTOT = ops.NchanTOT;
 NT       = ops.NT ;
 
